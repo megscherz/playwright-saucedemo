@@ -1,6 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 
-export class InventoryPage {
+export class CheckoutPage {
   readonly page: Page;
   readonly checkoutButton: Locator;
   readonly firstNameInput: Locator;

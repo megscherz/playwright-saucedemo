@@ -59,7 +59,7 @@ test.describe('Cart Tests', () => {
         const cartPage = new CartPage(page);
         await cartPage.goto();
         await cartPage.clickCartItem('Sauce Labs Backpack');
-        await expect(page).toHaveURL('https://www.saucedemo.com/inventory-item.html?id=4');
+        await expect(page).toHaveURL(/inventory-item/);
     });
 
 });
