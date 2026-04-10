@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
+import { CartPage } from '../pages/CartPage';
+//import { CheckoutPage } from '../pages/CheckoutPage';   
 
 test.describe('Cart Tests', () => {
 
@@ -9,45 +11,55 @@ test.describe('Cart Tests', () => {
         await loginPage.goto();
         await loginPage.login('standard_user', 'secret_sauce');
         await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+
+        const inventoryPage = new InventoryPage(page);
+        await inventoryPage.addBackpackToCart();
     });
 
     test('should add backpack to cart and verify cart count', async ({ page }) => {
         const inventoryPage = new InventoryPage(page);
-        await inventoryPage.addBackpackToCart();
         const cartCount = await inventoryPage.getCartCount();
         expect(cartCount).toBe('1');
     });
 
-    test('should sort products by price low to high and verify sorting', async ({ page }) => {
-        const inventoryPage = new InventoryPage(page);
-        await inventoryPage.sortBy('lohi');
-        const prices = await inventoryPage.getProductPrices();
-        const sortedPrices = [...prices].sort((a, b) => a - b);
-        expect(prices).toEqual(sortedPrices);
+    test('should verify cart page', async ({ page }) => {
+        const cartPage = new CartPage(page);
+        await cartPage.goto();
+        await expect(page).toHaveURL('https://www.saucedemo.com/cart.html');
+        await expect(cartPage.page.locator('.cart_item')).toHaveCount(1);
+        await expect(cartPage.page.locator('.inventory_item_name')).toHaveText('Sauce Labs Backpack');
+        await expect(cartPage.page.locator('.inventory_item_price')).toHaveText('$29.99');
+        await expect(cartPage.checkoutButton).toBeVisible();
+        await expect(cartPage.continueShoppingButton).toBeVisible();
+        await expect(cartPage.getRemoveButton('sauce-labs-backpack')).toBeVisible();
     });
 
-    test('should sort products by price high to low and verify sorting', async ({ page }) => {
-        const inventoryPage = new InventoryPage(page);
-        await inventoryPage.sortBy('hilo');
-        const prices = await inventoryPage.getProductPrices();
-        const sortedPrices = [...prices].sort((a, b) => b - a);
-        expect(prices).toEqual(sortedPrices);
+    test('should remove item from cart', async ({ page }) => {
+        const cartPage = new CartPage(page);
+        await cartPage.goto();
+        await cartPage.removeItemFromCart('sauce-labs-backpack');
+        await expect(cartPage.page.locator('.cart_item')).toHaveCount(0);
     });
 
-    test('should sort products by name A to Z and verify sorting', async ({ page }) => {
-        const inventoryPage = new InventoryPage(page);
-        await inventoryPage.sortBy('az');
-        const names = await inventoryPage.getProductNames();
-        const sortedNames = [...names].sort();
-        expect(names).toEqual(sortedNames);
+    test('should proceed to checkout', async ({ page }) => {
+        const cartPage = new CartPage(page);
+        await cartPage.goto();
+        await cartPage.proceedToCheckout();
+        await expect(page).toHaveURL('https://www.saucedemo.com/checkout-step-one.html');
     });
 
-    test('should sort products by name Z to A and verify sorting', async ({ page }) => {
-        const inventoryPage = new InventoryPage(page);
-        await inventoryPage.sortBy('za');
-        const names = await inventoryPage.getProductNames();
-        const sortedNames = [...names].sort().reverse();
-        expect(names).toEqual(sortedNames);
-    }); 
+    test('should be in cart and continue shopping to inventory page', async ({ page }) => {
+        const cartPage = new CartPage(page);
+        await cartPage.goto();
+        await cartPage.continueShopping();
+        await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+    });
+
+    test('should click on cart item and navigate to inventory item details page', async ({ page }) => {
+        const cartPage = new CartPage(page);
+        await cartPage.goto();
+        await cartPage.clickCartItem('Sauce Labs Backpack');
+        await expect(page).toHaveURL('https://www.saucedemo.com/inventory-item.html?id=4');
+    });
 
 });
