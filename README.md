@@ -23,10 +23,12 @@ This project was built to demonstrate end-to-end test automation skills using Pl
 | Sorting | Sort by price (low/high), sort by name (A-Z, Z-A) |
 
 ## Project Structure
+```
 ├── tests/          # Test specs
 ├── pages/          # Page Object Models
 ├── playwright.config.ts
 └── README.md
+```
 
 ## How To Run
 ```bash
