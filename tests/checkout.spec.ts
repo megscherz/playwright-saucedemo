@@ -22,10 +22,7 @@ test.describe('Checkout Tests', () => {
 
     test('should fill out checkout information and continue to checkout step two', async ({ page }) => {
         const checkoutPage = new CheckoutPage(page);
-        await checkoutPage.firstNameInput.fill('John');
-        await checkoutPage.lastNameInput.fill('Doe');
-        await checkoutPage.zipCodeInput.fill('12345');
-        await checkoutPage.continueButton.click();
+        await checkoutPage.fillCheckoutInfo('John', 'Doe', '12345');
         await expect(page).toHaveURL('https://www.saucedemo.com/checkout-step-two.html');
     });
 
@@ -37,15 +34,12 @@ test.describe('Checkout Tests', () => {
     
     test('should complete checkout and verify order completion', async ({ page }) => {
         const checkoutPage = new CheckoutPage(page);
-        await checkoutPage.firstNameInput.fill('John');
-        await checkoutPage.lastNameInput.fill('Doe');
-        await checkoutPage.zipCodeInput.fill('12345');
-        await checkoutPage.continueButton.click();
-        await expect(page).toHaveURL('https://www.saucedemo.com/checkout-step-two.html');
-        await checkoutPage.finishButton.click();
+        await checkoutPage.fillCheckoutInfo('John', 'Doe', '12345');
+        await checkoutPage.completeOrder();
         await expect(page).toHaveURL('https://www.saucedemo.com/checkout-complete.html');
-        await expect(checkoutPage.completeOrderHeader).toHaveText('THANK YOU FOR YOUR ORDER');
-        await expect(checkoutPage.completeOrderMessage).toHaveText('Your order has been dispatched, and will arrive just as fast as the pony can get there!');
+        const confirmation = await checkoutPage.orderConfirmation();
+        expect(confirmation.header).toContain('Thank you for your order!');
+        expect(confirmation.message).toContain('Your order has been dispatched, and will arrive just as fast as the pony can get there!');
     });
-    
+
 });
