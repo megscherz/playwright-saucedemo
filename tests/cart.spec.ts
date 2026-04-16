@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
+import { validUser } from '../testData/users';
 //import { CheckoutPage } from '../pages/CheckoutPage';   
 
 test.describe('Cart Tests', () => {
@@ -9,7 +10,7 @@ test.describe('Cart Tests', () => {
     test.beforeEach(async ({ page }) => {
         const loginPage = new LoginPage(page);
         await loginPage.goto();
-        await loginPage.login('standard_user', 'secret_sauce');
+        await loginPage.login(validUser.username, validUser.password);
         await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
 
         const inventoryPage = new InventoryPage(page);
