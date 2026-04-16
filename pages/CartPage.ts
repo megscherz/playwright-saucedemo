@@ -6,7 +6,9 @@ export class CartPage {
   readonly shoppingCart: Locator;
   readonly continueShoppingButton: Locator;
   readonly checkoutButton: Locator;
-
+  readonly cartItems: Locator;
+  readonly itemName: Locator;
+  readonly itemPrice: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -18,6 +20,9 @@ export class CartPage {
       '[data-test="continue-shopping"]',
     );
     this.checkoutButton = page.locator('[data-test="checkout"]');
+    this.cartItems = page.locator(".cart_item");
+    this.itemName = page.locator(".inventory_item_name");
+    this.itemPrice = page.locator(".inventory_item_price");
   }
 
   async goto() {
@@ -29,7 +34,9 @@ export class CartPage {
   }
 
   async clickCartItem(itemName: string) {
-    await this.page.locator(`.inventory_item_name:has-text("${itemName}")`).click();
+    await this.page
+      .locator(`.inventory_item_name:has-text("${itemName}")`)
+      .click();
   }
 
   getRemoveButton(itemName: string): Locator {
@@ -46,5 +53,17 @@ export class CartPage {
 
   async continueShopping() {
     await this.continueShoppingButton.click();
+  }
+
+  async getCartItemCount() {
+    return this.cartItems.count();
+  }
+
+  async getItemName() {
+    return this.itemName.textContent();
+  }
+
+  async getItemPrice() {
+    return this.itemPrice.textContent();
   }
 }
